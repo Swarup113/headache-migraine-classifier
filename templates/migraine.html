@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Migraine Variants Classification</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      margin: 0;
+      padding: 20px;
+      background-color: #bdbdbd;
+    }
+    .wrapper {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 20px;
+    }
+    .instructions {
+      background-color: #fff3cd;
+      padding: 15px;
+      border-left: 5px solid #ffc107;
+      margin-bottom: 20px;
+      border-radius: 5px;
+      font-size: 14px;
+    }
+    .form-container {
+      background: rgba(236, 236, 236, 0.78);
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 12px;
+    }
+    @media (max-width: 1024px) {
+      .form-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+    @media (max-width: 768px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    .form-group {
+      margin-bottom: 8px;
+      display: flex;
+      flex-direction: column;
+    }
+    label {
+      font-weight: bold;
+      margin-bottom: 3px;
+      font-size: 13px;
+    }
+    .input-description {
+      font-size: 11px;
+      color: #666;
+      margin-bottom: 3px;
+    }
+    select, input[type="number"] {
+      padding: 4px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    .button-container {
+      grid-column: span 3;
+      margin-top: 10px;
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      align-items: center;
+    }
+    @media (max-width: 1024px) {
+      .button-container {
+        grid-column: span 2;
+      }
+    }
+    @media (max-width: 768px) {
+      .button-container {
+        grid-column: span 1;
+      }
+    }
+    .back-button {
+      padding: 12px 20px;
+      background: #6c757d;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background 0.3s ease;
+    }
+    .back-button:hover {
+      background: #5a6268;
+    }
+    .gradient-button {
+      padding: 12px 30px;
+      background: linear-gradient(to right, #777, #000);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background 0.3s ease;
+    }
+    .gradient-button:hover {
+      background: linear-gradient(to right, #000, #333);
+    }
+    .result {
+      margin-top: 20px;
+      padding: 15px;
+      background: #f8f9fa;
+      border-left: 5px solid #5cb85c;
+      display: none;
+    }
+    .recommendation {
+      margin-top: 20px;
+      padding: 15px;
+      background: #eeeeee;
+      border-left: 5px solid #333;
+      border-radius: 4px;
+      display: none;
+    }
+    .action-button {
+      margin-top: 15px;
+      padding: 10px 20px;
+      background: #333;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background 0.3s ease;
+    }
+    .action-button:hover {
+      background: #111;
+    }
+    .choices__inner {
+      padding: 2px 6px !important;
+      min-height: 28px !important;
+      line-height: 1.2 !important;
+      font-size: 14px !important;
+    }
+    .choices__item--selectable.is-highlighted {
+      background: linear-gradient(to right, #777, #000) !important;
+      color: white !important;
+    }
+    .feature-group {
+      margin-bottom: 12px;
+      padding: 8px;
+      border: 2px solid #e0e0e0;
+      border-radius: 10px;
+      background-color: #f9f9f9;
+    }
+    .feature-group h3 {
+      margin-top: 0;
+      margin-bottom: 8px;
+      color: #444;
+      font-size: 14px;
+      padding-bottom: 3px;
+      border-bottom: 1px solid #ddd;
+    }
+    .error-message {
+      color: #d9534f;
+      background-color: #f2dede;
+      padding: 10px;
+      border-radius: 4px;
+      margin-top: 10px;
+      display: none;
+    }
+    /* New styles for prediction text */
+    #predictionText {
+      font-size: 20px;
+    }
+    .migraine-type {
+      font-weight: bold;
+    }
+    /* New styles for recommendation text */
+    .highlight {
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <h1>Migraine Variants Classification</h1>
+    <div class="instructions">
+        Please provide information about your headache symptoms. All fields are required for accurate prediction.<br/>
+       <strong>⚠️ Disclaimer:</strong> This tool is for assistance purposes only and should not replace professional medical advice.
+    </div>
+    
+    <div class="form-container">
+      <form id="predictionForm">
+        <div class="form-grid">
+          <!-- COLUMN 1 -->
+          <div>
+            <!-- Patient Information Group -->
+            <div class="feature-group">
+              <h3>Patient Information</h3>
+              <div class="form-group">
+                <label for="Age">Age</label>
+                <div class="input-description">Enter your age</div>
+                <input type="number" id="Age" name="Age" required min="1" max="120">
+              </div>
+              <div class="form-group">
+                <label for="Frequency">Frequency</label>
+                <div class="input-description">How many episodes per month?</div>
+                <input type="number" id="Frequency" name="Frequency" required min="0" max="30">
+              </div>
+            </div>
+            
+            <!-- Aura Symptoms Group -->
+            <div class="feature-group">
+              <h3>Aura Symptoms</h3>
+              <div class="form-group">
+                <label for="Visual">Visual Symptoms</label>
+                <div class="input-description">Number of reversible visual symptoms</div>
+                <input type="number" id="Visual" name="Visual" required min="0" max="10">
+              </div>
+              <div class="form-group">
+                <label for="Sensory">Sensory Symptoms</label>
+                <div class="input-description">Number of reversible sensory symptoms</div>
+                <input type="number" id="Sensory" name="Sensory" required min="0" max="10">
+              </div>
+            </div>
+            
+            <!-- Sensory Symptoms Group -->
+            <div class="feature-group">
+              <h3>Sensory Symptoms</h3>
+              <div class="form-group">
+                <label for="Phonophobia">Phonophobia</label>
+                <div class="input-description">Noise sensitivity?</div>
+                <select id="Phonophobia" name="Phonophobia" required>
+                  <option value="Not">No</option>
+                  <option value="Yes">Yes</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="Photophobia">Photophobia</label>
+                <div class="input-description">Light sensitivity?</div>
+                <select id="Photophobia" name="Photophobia" required>
+                  <option value="Not">No</option>
+                  <option value="Yes">Yes</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          
+          <!-- COLUMN 2 -->
+          <div>
+            <!-- Pain Characteristics Group -->
+            <div class="feature-group">
+              <h3>Pain Characteristics</h3>
+              <div class="form-group">
+                <label for="Location">Pain Location</label>
+                <div class="input-description">Is the pain on one side (Unilateral) or both (Bilateral)?</div>
+                <select id="Location" name="Location" required>
+                  <option value="None">None</option>
+                  <option value="Unilateral">Unilateral</option>
+                  <option value="Bilateral">Bilateral</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="Character">Pain Character</label>
+                <div class="input-description">Is the pain throbbing or constant?</div>
+                <select id="Character" name="Character" required>
+                  <option value="None">None</option>
+                  <option value="Throbbing">Throbbing</option>
+                  <option value="Constant">Constant</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="Intensity">Pain Intensity</label>
+                <div class="input-description">How intense is the pain?</div>
+                <select id="Intensity" name="Intensity" required>
+                  <option value="None">None</option>
+                  <option value="Mild">Mild</option>
+                  <option value="Medium">Medium</option>
+                  <option value="Severe">Severe</option>
+                </select>
+              </div>
+            </div>
+            
+            <!-- Gastrointestinal Symptoms Group -->
+            <div class="feature-group">
+              <h3>Gastrointestinal Symptoms</h3>
+              <div class="form-group">
+                <label for="Vomit">Vomiting</label>
+                <div class="input-description">Do you experience vomiting?</div>
+                <select id="Vomit" name="Vomit" required>
+                  <option value="Not">No</option>
+                  <option value="Yes">Yes</option>
+                </select>
+              </div>
+            </div>
+            
+            <!-- Family History Group -->
+            <div class="feature-group">
+              <h3>Family History</h3>
+              <div class="form-group">
+                <label for="DPF">DPF</label>
+                <div class="input-description">Family background of migraine?</div>
+                <select id="DPF" name="DPF" required>
+                  <option value="Not">No</option>
+                  <option value="Yes">Yes</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          
+          <!-- COLUMN 3 -->
+          <div>
+            <!-- Neurological Symptoms Group -->
+            <div class="feature-group">
+              <h3>Neurological Symptoms</h3>
+              <div class="form-group">
+                <label for="Dysphasia">Dysphasia</label>
+                <div class="input-description">Speech coordination issues?</div>
+                <select id="Dysphasia" name="Dysphasia" required>
+                  <option value="Not">No</option>
+                  <option value="Yes">Yes</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="Vertigo">Vertigo</label>
+                <div class="input-description">Do you feel dizzy?</div>
+                <select id="Vertigo" name="Vertigo" required>
+                  <option value="Not">No</option>
+                  <option value="Yes">Yes</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="Tinnitus">Tinnitus</label>
+                <div class="input-description">Ear ringing?</div>
+                <select id="Tinnitus" name="Tinnitus" required>
+                  <option value="Not">No</option>
+                  <option value="Yes">Yes</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="Hypoacusis">Hypoacusis</label>
+                <div class="input-description">Hearing loss?</div>
+                <select id="Hypoacusis" name="Hypoacusis" required>
+                  <option value="Not">No</option>
+                  <option value="Yes">Yes</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="Visual_defect">Visual Defect</label>
+                <div class="input-description">Any visual field defects?</div>
+                <select id="Visual_defect" name="Visual_defect" required>
+                  <option value="Not">No</option>
+                  <option value="Yes">Yes</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="Conscience">Conscience</label>
+                <div class="input-description">Jeopardized consciousness?</div>
+                <select id="Conscience" name="Conscience" required>
+                  <option value="Not">No</option>
+                  <option value="Yes">Yes</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="button-container">
+          <button type="button" class="back-button" id="backButton">← Back</button>
+          <button type="submit" class="gradient-button">Classify Migraine Variants</button>
+        </div>
+        <div id="errorMessage" class="error-message">
+          Please provide symptom information before submitting.
+        </div>
+      </form>
+    </div>
+    
+    <div id="result" class="result">
+      <h2>Prediction Result</h2>
+      <p id="predictionText"></p>
+    </div>
+    
+    <div id="recommendation" class="recommendation">
+      <h3>Recommendation</h3>
+      <p id="recommendationText"></p>
+      <button id="actionButton" class="action-button">Check Out Now!</button>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+  <script>
+    document.querySelectorAll('select').forEach(function(selectElement) {
+      new Choices(selectElement, {
+        shouldSort: false,
+        searchEnabled: false,
+        itemSelectText: '',
+      });
+    });
+    
+    // Back button with confirmation
+    document.getElementById('backButton').addEventListener('click', function() {
+      if (confirm('Are you sure you want to go back? Any unsaved data will be lost.')) {
+        window.location.href = '/';
+      }
+    });
+    
+    // Action button click handler
+    document.getElementById('actionButton').addEventListener('click', function() {
+      window.location.href = '/headache';
+    });
+    
+    document.getElementById('predictionForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      // Validate form to ensure at least one symptom is provided
+      const inputs = document.querySelectorAll('input, select');
+      let hasInput = false;
+      
+      inputs.forEach(input => {
+        // For numeric inputs, check if value is greater than 0
+        if (input.type === 'number') {
+          if (parseFloat(input.value) > 0) {
+            hasInput = true;
+          }
+        } 
+        // For select elements, check if value is different from the first option
+        else if (input.tagName === 'SELECT') {
+          if (input.value !== input.options[0].value) {
+            hasInput = true;
+          }
+        }
+      });
+      
+      if (!hasInput) {
+        // Show error message
+        document.getElementById('errorMessage').style.display = 'block';
+        // Scroll to error message
+        document.getElementById('errorMessage').scrollIntoView({ behavior: 'smooth' });
+        return;
+      } else {
+        // Hide error message if it was previously shown
+        document.getElementById('errorMessage').style.display = 'none';
+      }
+      
+      const formData = new FormData(this);
+      fetch('/predict_migraine', {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+        // Update prediction text with increased font size and bold type
+        document.getElementById('predictionText').innerHTML = 
+          'Predicted Migraine Variants: <span class="migraine-type">' + data.migraine_type + '</span>';
+        document.getElementById('result').style.display = 'block';
+        
+        // Show recommendation if "Other" is predicted
+        if (data.migraine_type === "Other") {
+          document.getElementById('recommendationText').innerHTML = 
+            'Your symptoms suggest a type of <span class="highlight">migraine</span> that may need further classification. ' +
+            'We recommend trying our <span class="highlight">Headache Disorder Classification tool</span> to get a more specific diagnosis.';
+          document.getElementById('recommendation').style.display = 'block';
+        } else {
+          document.getElementById('recommendation').style.display = 'none';
+        }
+        
+        // Scroll to result
+        document.getElementById('result').scrollIntoView({ behavior: 'smooth' });
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred during prediction. Please try again.');
+      });
+    });
+  </script>
+</body>
+</html>

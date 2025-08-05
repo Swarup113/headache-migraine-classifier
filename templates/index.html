@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Headache & Migraine Classification System</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+        
+        :root {
+            --primary-gradient: linear-gradient(to right, #808080, #000000);
+            --primary-hover: linear-gradient(to right, #606060, #000000);
+            --text-primary: #333;
+            --text-secondary: #555;
+            --text-light: #777;
+            --bg-color: #bdbdbd;
+            --card-bg: #ffffff;
+            --border-color: #e9ecef;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            background-color: var(--bg-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-primary);
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            width: 100%;
+            text-align: center;
+            padding: 50px 40px;
+            background: rgba(236, 236, 236, 0.78);
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border-color);
+        }
+        
+        .icon {
+            font-size: 3rem;
+            margin-bottom: 25px;
+            /* Force emoji to be dark and monochrome */
+            filter: grayscale(100%) brightness(0.3) contrast(2);
+            -webkit-filter: grayscale(100%) brightness(0.3) contrast(2);
+        }
+        
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--text-primary);
+            line-height: 1.3;
+        }
+        
+        .description {
+            color: var(--text-secondary);
+            margin-bottom: 40px;
+            font-size: 1.1rem;
+            max-width: 650px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 16px 32px;
+            background: var(--primary-gradient);
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 500;
+            font-size: 1.05rem;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            min-width: 280px;
+        }
+        
+        .btn:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        
+        .footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+            color: var(--text-light);
+            font-size: 0.95rem;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 40px 25px;
+            }
+            
+            h1 {
+                font-size: 1.9rem;
+            }
+            
+            .description {
+                font-size: 1rem;
+            }
+            
+            .btn {
+                min-width: 240px;
+                padding: 14px 28px;
+                font-size: 1rem;
+            }
+            
+            .buttons {
+                gap: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="icon">🧠</div>
+        
+        <h1>Primary Headache Disorder & Migraine Variants Classification System</h1>
+        
+        <p class="description">
+            This tool helps classify different types of headaches and migraines based on symptoms. 
+            Select the classification type below to get started.
+        </p>
+        
+        <div class="buttons">
+            <a href="/migraine" class="btn">Migraine Variants Classification</a>
+            <a href="/headache" class="btn">Primary Headache Disorder Classification</a>
+        </div>
+        
+        <div class="footer">
+            <p>This tool is for assistance purposes only and should not replace professional medical advice.</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Headache Disorder Classification</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      margin: 0;
+      padding: 20px;
+      background-color: #bdbdbd;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 20px;
+    }
+    .instructions {
+      background-color: #fff3cd;
+      padding: 15px;
+      border-left: 5px solid #ffc107;
+      margin-bottom: 20px;
+      border-radius: 5px;
+      font-size: 14px;
+    }
+
+    .form-container {
+      background: rgba(236, 236, 236, 0.78);
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    .form-group {
+      margin-bottom: 8px;
+      display: flex;
+      flex-direction: column;
+    }
+    label {
+      font-weight: bold;
+      margin-bottom: 3px;
+      font-size: 13px;
+    }
+    .input-description {
+      font-size: 11px;
+      color: #666;
+      margin-bottom: 3px;
+    }
+    select, input[type="number"] {
+      padding: 4px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 12px;
+    }
+    @media (max-width: 1024px) {
+      .grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+    @media (max-width: 768px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    .button-container {
+      grid-column: span 3;
+      margin-top: 10px;
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      align-items: center;
+    }
+    @media (max-width: 1024px) {
+      .button-container {
+        grid-column: span 2;
+      }
+    }
+    @media (max-width: 768px) {
+      .button-container {
+        grid-column: span 1;
+      }
+    }
+    .back-button {
+      padding: 12px 20px;
+      background: #6c757d;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background 0.3s ease;
+    }
+    .back-button:hover {
+      background: #5a6268;
+    }
+    .gradient-button {
+      padding: 12px 30px;
+      background: linear-gradient(to right, #777, #000);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: all 0.3s ease;
+    }
+    .gradient-button:hover {
+      background: linear-gradient(to right, #000, #333);
+    }
+    .result {
+      margin-top: 20px;
+      padding: 15px;
+      background: #f8f9fa;
+      border-left: 5px solid #5cb85c;
+      display: none;
+    }
+    .recommendation {
+      margin-top: 20px;
+      padding: 15px;
+      background: #eeeeee;
+      border-left: 5px solid #333;
+      border-radius: 4px;
+      display: none;
+    }
+    .action-button {
+      margin-top: 15px;
+      padding: 10px 20px;
+      background: #333;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background 0.3s ease;
+    }
+    .action-button:hover {
+      background: #111;
+    }
+    .choices__inner {
+      padding: 2px 6px !important;
+      min-height: 28px !important;
+      line-height: 1.2 !important;
+      font-size: 14px !important;
+    }
+    .choices__item--selectable.is-highlighted {
+      background: linear-gradient(to right, #777, #000) !important;
+      color: white !important;
+    }
+    .feature-group {
+      margin-bottom: 12px;
+      padding: 8px;
+      border: 2px solid #e0e0e0;
+      border-radius: 10px;
+      background-color: #f9f9f9;
+    }
+    .feature-group h3 {
+      margin-top: 0;
+      margin-bottom: 8px;
+      color: #444;
+      font-size: 14px;
+      padding-bottom: 3px;
+      border-bottom: 1px solid #ddd;
+    }
+    .error-message {
+      color: #d9534f;
+      background-color: #f2dede;
+      padding: 10px;
+      border-radius: 4px;
+      margin-top: 10px;
+      display: none;
+    }
+    /* New styles for prediction text */
+    #predictionText {
+      font-size: 20px;
+    }
+    .headache-type {
+      font-weight: bold;
+    }
+    /* New styles for recommendation text */
+    .highlight {
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Primary Headache Disorder Classification</h1>
+    <div class="instructions">
+        Please provide information about your headache symptoms. All fields are required for accurate prediction.<br/>
+       <strong>⚠️ Disclaimer:</strong> This tool is for assistance purposes only and should not replace professional medical advice.
+    </div>
+    
+    <div class="form-container">
+      <form id="predictionForm">
+        <div class="grid">
+          <!-- COLUMN 1 -->
+          <div>
+            <!-- Pain Characteristics Group -->
+            <div class="feature-group">
+              <h3>Pain Characteristics</h3>
+              <div class="form-group">
+                <label for="characterisation_pulsating">Pulsating</label>
+                <div class="input-description">Is the pain throbbing or pulsating?</div>
+                <select id="characterisation_pulsating" name="characterisation_pulsating" required>
+                  <option>No</option>
+                  <option>Yes</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="characterisation_pressing">Pressing</label>
+                <div class="input-description">Is the pain pressing or tightening?</div>
+                <select id="characterisation_pressing" name="characterisation_pressing" required>
+                  <option>No</option>
+                  <option>Yes</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="characterisation_stabbing">Stabbing</label>
+                <div class="input-description">Is the pain sharp or stabbing?</div>
+                <select id="characterisation_stabbing" name="characterisation_stabbing" required>
+                  <option>No</option>
+                  <option>Yes</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="severity">Severity</label>
+                <div class="input-description">How severe is the pain?</div>
+                <select id="severity" name="severity" required>
+                  <option>Mild</option>
+                  <option>Moderate</option>
+                  <option>Severe</option>
+                </select>
+              </div>
+            </div>
+            
+            <!-- Location Features Group -->
+            <div class="feature-group">
+              <h3>Location Features</h3>
+              <div class="form-group">
+                <label for="location_unilateral">Unilateral</label>
+                <div class="input-description">Is the pain on one side of the head?</div>
+                <select id="location_unilateral" name="location_unilateral" required>
+                  <option>No</option>
+                  <option>Yes</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="location_bilateral">Bilateral</label>
+                <div class="input-description">Is the pain on both sides of the head?</div>
+                <select id="location_bilateral" name="location_bilateral" required>
+                  <option>No</option>
+                  <option>Yes</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="location_orbital">Orbital</label>
+                <div class="input-description">Is the pain around the eye area?</div>
+                <select id="location_orbital" name="location_orbital" required>
+                  <option>No</option>
+                  <option>Yes</option>
+                </select>
+              </div>
+            </div>
+            
+            <!-- Sensory Symptoms Group -->
+            <div class="feature-group">
+              <h3>Sensory Symptoms</h3>
+              <div class="form-group">
+                <label for="photophobia">Photophobia</label>
+                <div class="input-description">Are you sensitive to light?</div>
+                <select id="photophobia" name="photophobia" required>
+                  <option>No</option>
+                  <option>Yes</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="phonophobia">Phonophobia</label>
+                <div class="input-description">Are you sensitive to sound?</div>
+                <select id="phonophobia" name="phonophobia" required>
+                  <option>No</option>
+                  <option>Yes</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="aggravation">Aggravation by Physical Activity</label>
+                <div class="input-description">Does physical activity make the pain worse?</div>
+                <select id="aggravation" name="aggravation" required>
+                  <option>No</option>
+                  <option>Yes</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="pericranial">Pericranial Tenderness</label>
+                <div class="input-description">Is there tenderness in the scalp or neck muscles?</div>
+                <select id="pericranial" name="pericranial" required>
+                  <option>No</option>
+                  <option>Yes</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          
+          <!-- COLUMN 2 -->
+          <div>
+            <!-- Aura-Related Symptoms Group -->
+            <div class="feature-group">
+              <h3>Aura-Related Symptoms</h3>
+              <div class="form-group">
+                <label for="headache_with_aura">Headache with Aura</label>
+                <div class="input-description">Do you experience visual or sensory disturbances before headache?</div>
+                <select id="headache_with_aura" name="headache_with_aura" required>
+                  <option>No</option>
+                  <option>Yes</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="aura_duration">Aura Duration</label>
+                <div class="input-description">How long do aura symptoms typically last?</div>
+                <select id="aura_duration" name="aura_duration" required>
+                  <option>None</option>
+                  <option>Hour</option>
+                  <option>Day</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="aura_development">Aura Development</label>
+                <div class="input-description">Do aura symptoms develop gradually over 5+ minutes?</div>
+                <select id="aura_development" name="aura_development" required>
+                  <option>No</option>
+                  <option>Yes</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="visual_symptomps">Visual Symptoms</label>
+                <div class="input-description">Do you see flashing lights, zigzag lines, or blind spots?</div>
+                <select id="visual_symptomps" name="visual_symptomps" required>
+                  <option>No</option>
+                  <option>Yes</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="sensory_symptomps">Sensory Symptoms</label>
+                <div class="input-description">Do you experience numbness or tingling sensations?</div>
+                <select id="sensory_symptomps" name="sensory_symptomps" required>
+                  <option>No</option>
+                  <option>Yes</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="homonymous_symptomps">Homonymous Symptoms</label>
+                <div class="input-description">Do you have visual disturbances affecting the same side of both eyes?</div>
+                <select id="homonymous_symptomps" name="homonymous_symptomps" required>
+                  <option>No</option>
+                  <option>Yes</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="diplopia">Diplopia</label>
+                <div class="input-description">Do you experience double vision?</div>
+                <select id="diplopia" name="diplopia" required>
+                  <option>No</option>
+                  <option>Yes</option>
+                </select>
+              </div>
+            </div>
+            
+            <!-- Duration Group -->
+            <div class="feature-group">
+              <h3>Duration</h3>
+              <div class="form-group">
+                <label for="durationGroup">Duration Group</label>
+                <div class="input-description">How long do your headaches typically last?</div>
+                <select id="durationGroup" name="durationGroup" required>
+                  <option value="A">Less than 1 minute</option>
+                  <option value="B">3-5 minutes</option>
+                  <option value="C">2-4 minutes</option>
+                  <option value="D">4-15 minutes</option>
+                  <option value="E">15-30 minutes</option>
+                  <option value="F">30 minutes - 3 hours</option>
+                  <option value="G">3-4 hours</option>
+                  <option value="H">4 hours - 3 days</option>
+                  <option value="I">3-7 days</option>
+                  <option value="J">More than 1 week</option>
+                </select>
+              </div>
+            </div>
+            
+            <!-- Autonomic Symptoms Group (Part 2) -->
+            <div class="feature-group">
+              <h3>Autonomic Symptoms (1/2)</h3>
+              <div class="form-group">
+                <label for="eyelid_oedema">Eyelid Oedema</label>
+                <div class="input-description">Do you have swelling of the eyelids?</div>
+                <select id="eyelid_oedema" name="eyelid_oedema" required>
+                  <option>No</option>
+                  <option>Yes</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="miosis">Miosis</label>
+                <div class="input-description">Do you have pupil constriction?</div>
+                <select id="miosis" name="miosis" required>
+                  <option>No</option>
+                  <option>Yes</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="ptosis">Ptosis</label>
+                <div class="input-description">Do you have drooping eyelids?</div>
+                <select id="ptosis" name="ptosis" required>
+                  <option>No</option>
+                  <option>Yes</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          
+          <!-- COLUMN 3 -->
+          <div>
+            <!-- Autonomic Symptoms Group (Part 1) -->
+            <div class="feature-group">
+              <h3>Autonomic Symptoms (2/2)</h3>
+              <div class="form-group">
+                <label for="lacrimation">Lacrimation</label>
+                <div class="input-description">Do you experience tearing or watery eyes?</div>
+                <select id="lacrimation" name="lacrimation" required>
+                  <option>No</option>
+                  <option>Yes</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="rhinorrhoea">Rhinorrhoea</label>
+                <div class="input-description">Do you have a runny nose?</div>
+                <select id="rhinorrhoea" name="rhinorrhoea" required>
+                  <option>No</option>
+                  <option>Yes</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="nasal_congestion">Nasal Congestion</label>
+                <div class="input-description">Do you have a stuffy nose?</div>
+                <select id="nasal_congestion" name="nasal_congestion" required>
+                  <option>No</option>
+                  <option>Yes</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="sweating">Sweating</label>
+                <div class="input-description">Do you experience sweating during headaches?</div>
+                <select id="sweating" name="sweating" required>
+                  <option>No</option>
+                  <option>Yes</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="conjunctival_injection">Conjunctival Injection</label>
+                <div class="input-description">Are your eyes red or bloodshot?</div>
+                <select id="conjunctival_injection" name="conjunctival_injection" required>
+                  <option>No</option>
+                  <option>Yes</option>
+                </select>
+              </div>
+            </div>
+            
+            <!-- Severe Indicators Group -->
+            <div class="feature-group">
+              <h3>Severe Indicators</h3>
+              <div class="form-group">
+                <label for="vomitting">Vomiting</label>
+                <div class="input-description">Do you vomit during headaches?</div>
+                <select id="vomitting" name="vomitting" required>
+                  <option>No</option>
+                  <option>Yes</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="nausea">Nausea</label>
+                <div class="input-description">Do you feel nauseated during headaches?</div>
+                <select id="nausea" name="nausea" required>
+                  <option>No</option>
+                  <option>Yes</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="vertigo">Vertigo</label>
+                <div class="input-description">Do you feel dizzy or experience spinning sensations?</div>
+                <select id="vertigo" name="vertigo" required>
+                  <option>No</option>
+                  <option>Yes</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="hemiplegic">Hemiplegic</label>
+                <div class="input-description">Do you experience temporary paralysis on one side of the body?</div>
+                <select id="hemiplegic" name="hemiplegic" required>
+                  <option>No</option>
+                  <option>Yes</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="agitation">Agitation</label>
+                <div class="input-description">Do you feel restless or agitated during headaches?</div>
+                <select id="agitation" name="agitation" required>
+                  <option>No</option>
+                  <option>Yes</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="button-container">
+          <button type="button" class="back-button" id="backButton">← Back</button>
+          <button type="submit" class="gradient-button">Classify Headache Disorders</button>
+        </div>
+        <div id="errorMessage" class="error-message">
+          Please provide at least one symptom information before submitting.
+        </div>
+      </form>
+    </div>
+    
+    <div id="result" class="result">
+      <h2>Prediction Result</h2>
+      <p id="predictionText"></p>
+    </div>
+    
+    <div id="recommendation" class="recommendation">
+      <h3>Recommendation</h3>
+      <p id="recommendationText"></p>
+      <button id="actionButton" class="action-button">Check Out Now!</button>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+  <script>
+    document.querySelectorAll('select').forEach(function(selectElement) {
+      new Choices(selectElement, {
+        shouldSort: false,
+        searchEnabled: false,
+        itemSelectText: '',
+      });
+    });
+    
+    // Back button with confirmation
+    document.getElementById('backButton').addEventListener('click', function() {
+      if (confirm('Are you sure you want to go back? Any unsaved data will be lost.')) {
+        window.location.href = '/';
+      }
+    });
+    
+    // Action button click handler
+    document.getElementById('actionButton').addEventListener('click', function() {
+      window.location.href = '/migraine';
+    });
+    
+    document.getElementById('predictionForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      // Validate form to ensure at least one symptom is provided
+      const selects = document.querySelectorAll('select');
+      let hasInput = false;
+      
+      selects.forEach(select => {
+        // Check if any select has a value different from the default (first option)
+        if (select.value !== select.options[0].value) {
+          hasInput = true;
+        }
+      });
+      
+      if (!hasInput) {
+        // Show error message
+        document.getElementById('errorMessage').style.display = 'block';
+        // Scroll to error message
+        document.getElementById('errorMessage').scrollIntoView({ behavior: 'smooth' });
+        return;
+      } else {
+        // Hide error message if it was previously shown
+        document.getElementById('errorMessage').style.display = 'none';
+      }
+      
+      const formData = new FormData(this);
+      fetch('/predict_headache', {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+        // Update prediction text with increased font size and bold type
+        document.getElementById('predictionText').innerHTML = 
+          'Predicted Headache Type: <span class="headache-type">' + data.headache_type + '</span>';
+        document.getElementById('result').style.display = 'block';
+        
+        // Show recommendation if "Migraine" is predicted
+        if (data.headache_type === "Migraine") {
+          document.getElementById('recommendationText').innerHTML = 
+            'Your symptoms suggest you may have <span class="highlight">migraines</span>. ' +
+            'We recommend trying our <span class="highlight">Migraine Variants Classification tool</span> to determine the specific type of migraine.';
+          document.getElementById('recommendation').style.display = 'block';
+        } else {
+          document.getElementById('recommendation').style.display = 'none';
+        }
+        
+        // Scroll to result
+        document.getElementById('result').scrollIntoView({ behavior: 'smooth' });
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred during prediction. Please try again.');
+      });
+    });
+  </script>
+</body>
+</html>
